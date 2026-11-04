@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Onboarding Assistant | Maple Ridge Services</title>
+  <script src="/app.js" defer></script>
+  <style>
+    * { box-sizing: border-box; }
+    :root { color-scheme: light; --ink: #19392c; --muted: #475c50; --green: #225c41; --line: #cbd4c9; }
+    body { margin: 0; background: #f7f6ef; color: var(--ink); font: 1rem/1.55 system-ui, sans-serif; }
+    .masthead { border-bottom: 1px solid var(--line); }
+    .brand, main { width: min(44rem, calc(100% - 2.5rem)); margin: auto; }
+    .brand { display: flex; align-items: center; gap: .65rem; min-height: 4rem; font-weight: 700; }
+    .mark { display: grid; place-items: center; background: var(--green); color: white; width: 2rem;
+      height: 2rem; border-radius: .5rem; font: 600 .85rem Georgia, serif; }
+    main { padding: clamp(2rem, 6vh, 4.25rem) 0 3rem; }
+    .eyebrow { margin: 0; font-size: .76rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; color: var(--green); }
+    h1 { margin: .35rem 0 .55rem; font: 500 clamp(2.4rem, 6vw, 3.8rem)/1.07 Georgia, serif; }
+    .intro { max-width: 52ch; margin: 0 0 1.6rem; color: var(--muted); }
+    .card { padding: clamp(1.25rem, 4vw, 2rem); background: #fff; border: 1px solid var(--line); border-radius: .8rem; }
+    label, summary { font-weight: 650; }
+    .hint, .status { color: var(--muted); font-size: .94rem; }
+    .hint { margin: .25rem 0 .8rem; }
+    textarea { display: block; width: 100%; min-height: 6.75rem; resize: vertical; padding: .8rem; font: inherit;
+      border: 1px solid #7c9182; border-radius: .4rem; color: inherit; }
+    :focus-visible { outline: 3px solid #297858; outline-offset: 3px; }
+    button { cursor: pointer; font: 650 .96rem system-ui, sans-serif; }
+    #ask { background: var(--green); color: #fff; border: 0; border-radius: .4rem; padding: .75rem 1.3rem; }
+    #ask:disabled { cursor: wait; opacity: .65; }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.1rem; margin-top: .9rem; }
+    #example { padding: .5rem 0; border: 0; background: transparent; color: var(--green); text-decoration: underline; }
+    .status { margin: .6rem 0 0; }
+    .status:empty, [hidden] { display: none; }
+    #field-error { color: #8f2821; margin: .45rem 0 0; }
+    #result { margin-top: 1rem; border-top: 3px solid var(--green); overflow-wrap: anywhere; }
+    #result h2 { font: 500 1.65rem Georgia, serif; margin: 0; }
+    #message { white-space: pre-wrap; }
+    details { border-top: 1px solid var(--line); padding-top: .8rem; margin-top: .8rem; }
+    summary { cursor: pointer; color: var(--green); }
+    blockquote { border-left: 3px solid var(--line); margin: .8rem 0 0; padding-left: 1rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <header class="masthead"><div class="brand"><span class="mark" aria-hidden="true">MR</span>Maple Ridge Services</div></header>
+  <main>
+    <p class="eyebrow">Employee resources</p>
+    <h1>Onboarding Assistant</h1>
+    <p class="intro">Ask about starting work at Maple Ridge. Each answer includes the original wording from the orientation guide so you can check the details.</p>
+    <form id="question-form" class="card">
+      <label for="question">Your question</label>
+      <p id="privacy" class="hint">Do not enter personal or confidential information.</p>
+      <textarea id="question" rows="3" aria-describedby="privacy field-error"></textarea>
+      <p id="field-error" role="alert" hidden></p>
+      <div class="actions">
+        <button id="ask" type="submit" disabled>Ask</button>
+        <button id="example" type="button" hidden>Try the orientation question</button>
+      </div>
+      <p id="status" class="status" role="status"></p>
+      <noscript><p>Enable JavaScript to send a question.</p></noscript>
+    </form>
+    <section id="result" class="card" aria-labelledby="result-heading" hidden>
+      <h2 id="result-heading" tabindex="-1"></h2>
+      <p id="message"></p>
+      <div id="sources"></div>
+    </section>
+  </main>
+</body>
+</html>
