@@ -91,8 +91,12 @@ Then restart the server. If the key or model is missing, the page shows a servic
 
 ## Known limitations
 
-- Search ranks passages by word overlap. For "Where and when is new-hire orientation?", HR-01-P3 (what to bring) ranks above HR-01-P2 (where and when), though both are sent to the model. Review this during paraphrase testing.
-- Some unsupported questions still match common words (e.g., "sick **days**" matches HR-01 passages), so they reach the model, which must decline. Test mode cannot decline, so use a real provider when testing US-4.
+Search results for the 20 test questions with all five documents loaded:
+
+- **Direct (T01–T12):** expected passage is in the top 3 for all 12. It's ranked first for 11; T01 ranks HR-03-P4 first and HR-01-P2 second.
+- **Reworded (T13–T16):** T14 and T15 find the right passage. **T13** (vacation in first month → HR-04-P9) and **T16** (misplace work computer → HR-05-P6) miss.
+- **Unanswerable (T17–T20):** all four match some passage, so none stop at search. The model must decline every one. Test mode cannot decline, so use a real provider when testing US-4.
+- **Demo question:** "Where and when is new-hire orientation?" no longer retrieves HR-01-P2 (Room 204, 9 a.m.–noon). HR-03-P1, HR-04-P9 and HR-01-P3 outrank it. Tracked by an `xfail` test in `tests/test_api.py`; fix under US-3.
 
 ## Working agreement
 
