@@ -36,7 +36,17 @@ Leave `AI_PROVIDER=fake` for now. Test mode makes no API call and needs no key.
 python -m uvicorn app.main:app --reload
 ```
 
-Open http://127.0.0.1:8000 and click **Try the orientation question**. In test mode, the answer starts with "[Test mode…]" and shows the top matching HR-01 passage.
+Open http://127.0.0.1:8000. Choose an example topic to fill in a question, then click **Ask**. In test mode, the answer starts with "[Test mode…]" and quotes the top matching passage; this checks retrieval and the interface, not a real AI provider's answer accuracy.
+
+The examples cover all five HR documents:
+
+| Topic | Example question | Expected first passage |
+| --- | --- | --- |
+| Orientation | What room is orientation in? | HR-01-P2 |
+| Benefits | What does the dental plan cover? | HR-02-P4 |
+| Required forms | When must I complete Form I-9? | HR-03-P2 |
+| Leave | How do I request paid time off? | HR-04-P4 |
+| Workplace conduct | What is the dress code? | HR-05-P4 |
 
 The search database (`data/policies.db`) is built automatically on first start. After editing or adding a document in `data/documents/`, rebuild it:
 
@@ -57,8 +67,8 @@ The tests check every status code and result type in the contract (200, 400, 405
 On each teammate's machine, confirm:
 
 - [ ] Setup steps above work as written (note any step that fails)
-- [ ] The page loads and the orientation question returns a test-mode answer with an HR-01 source
-- [ ] A question with no matches (e.g., "Is dental coverage included?") shows **Contact HR**
+- [ ] The page loads, each topic fills in its example, and **Ask** returns the expected source listed above
+- [ ] A question with no matches (e.g., "Zebra xylophone quokka?") shows **Contact HR**
 - [ ] A question with an email address is rejected beside the field
 - [ ] `python -m pytest -q` passes
 - [ ] `git status` does not list `.env` or `data/policies.db`
@@ -86,7 +96,7 @@ Then restart the server. If the key or model is missing, the page shows a servic
 | `app/ai_adapter.py` | `generate_answer`, the only code that calls the AI provider |
 | `app/responses.py` | `build_response`: checks decisions and citations, builds sources from storage |
 | `static/` | Alex's `index.html` and `app.js` |
-| `data/documents/` | One JSON file per HR document (HR-01 now; HR-02 to HR-05 to come) |
+| `data/documents/` | Five JSON documents: orientation, benefits, required forms, leave, and workplace conduct (HR-01 to HR-05) |
 | `tests/` | Contract tests |
 
 ## Known limitations
@@ -96,7 +106,7 @@ Search results for the 20 test questions with all five documents loaded:
 - **Direct (T01–T12):** expected passage is in the top 3 for all 12. It's ranked first for 11; T01 ranks HR-03-P4 first and HR-01-P2 second.
 - **Reworded (T13–T16):** T14 and T15 find the right passage. **T13** (vacation in first month → HR-04-P9) and **T16** (misplace work computer → HR-05-P6) miss.
 - **Unanswerable (T17–T20):** all four match some passage, so none stop at search. The model must decline every one. Test mode cannot decline, so use a real provider when testing US-4.
-- **Demo question:** "Where and when is new-hire orientation?" no longer retrieves HR-01-P2 (Room 204, 9 a.m.–noon). HR-03-P1, HR-04-P9 and HR-01-P3 outrank it. Tracked by an `xfail` test in `tests/test_api.py`; fix under US-3.
+- **Original demo question:** "Where and when is new-hire orientation?" no longer retrieves HR-01-P2 (Room 204, 9 a.m.–noon). HR-03-P1, HR-04-P9 and HR-01-P3 outrank it. Tracked by an `xfail` test in `tests/test_api.py`; fix under US-3. The page now uses "What room is orientation in?" for its orientation example; the original question's search limitation remains unresolved.
 
 ## Working agreement
 
