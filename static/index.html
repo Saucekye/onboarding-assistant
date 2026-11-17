@@ -29,7 +29,11 @@
     #ask { background: var(--green); color: #fff; border: 0; border-radius: .4rem; padding: .75rem 1.3rem; }
     #ask:disabled { cursor: wait; opacity: .65; }
     .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.1rem; margin-top: .9rem; }
-    #example { padding: .5rem 0; border: 0; background: transparent; color: var(--green); text-decoration: underline; }
+    .examples { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 1rem; }
+    .example-list { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .example-question { padding: .5rem .75rem; border: 1px solid var(--line); border-radius: .4rem;
+      background: #f7f6ef; color: var(--green); }
+    .example-question:disabled { cursor: wait; opacity: .65; }
     .status { margin: .6rem 0 0; }
     .status:empty, [hidden] { display: none; }
     #field-error { color: #8f2821; margin: .45rem 0 0; }
@@ -46,7 +50,7 @@
   <main>
     <p class="eyebrow">Employee resources</p>
     <h1>Onboarding Assistant</h1>
-    <p class="intro">Ask about starting work at Maple Ridge. Each answer includes the original wording from the orientation guide so you can check the details.</p>
+    <p class="intro">Ask about orientation, benefits, required forms, leave, or workplace conduct at Maple Ridge. Answers include passages from the HR documents so you can check the details.</p>
     <form id="question-form" class="card">
       <label for="question">Your question</label>
       <p id="privacy" class="hint">Do not enter personal or confidential information.</p>
@@ -54,9 +58,18 @@
       <p id="field-error" role="alert" hidden></p>
       <div class="actions">
         <button id="ask" type="submit" disabled>Ask</button>
-        <button id="example" type="button" hidden>Try the orientation question</button>
       </div>
       <p id="status" class="status" role="status"></p>
+      <div id="examples" class="examples" role="group" aria-labelledby="examples-label" hidden>
+        <p id="examples-label" class="hint">Choose a topic to fill in an example, then select Ask.</p>
+        <div class="example-list">
+          <button class="example-question" type="button" data-question="What room is orientation in?">Orientation</button>
+          <button class="example-question" type="button" data-question="What does the dental plan cover?">Benefits</button>
+          <button class="example-question" type="button" data-question="When must I complete Form I-9?">Required forms</button>
+          <button class="example-question" type="button" data-question="How do I request paid time off?">Leave</button>
+          <button class="example-question" type="button" data-question="What is the dress code?">Workplace conduct</button>
+        </div>
+      </div>
       <noscript><p>Enable JavaScript to send a question.</p></noscript>
     </form>
     <section id="result" class="card" aria-labelledby="result-heading" hidden>

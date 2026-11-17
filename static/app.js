@@ -5,7 +5,8 @@ const REQUEST_TIMEOUT_MS = 20000;
 const questionForm = document.querySelector("#question-form");
 const questionInput = document.querySelector("#question");
 const askButton = document.querySelector("#ask");
-const exampleButton = document.querySelector("#example");
+const examplesContainer = document.querySelector("#examples");
+const exampleButtons = document.querySelectorAll(".example-question");
 const fieldError = document.querySelector("#field-error");
 const statusLine = document.querySelector("#status");
 const resultSection = document.querySelector("#result");
@@ -81,11 +82,13 @@ function clearFieldError() {
 }
 
 questionInput.addEventListener("input", clearFieldError);
-exampleButton.addEventListener("click", () => {
-  questionInput.value = "Where and when is new-hire orientation?";
-  clearFieldError();
-  questionInput.focus();
-});
+for (const exampleButton of exampleButtons) {
+  exampleButton.addEventListener("click", () => {
+    questionInput.value = exampleButton.dataset.question;
+    clearFieldError();
+    questionInput.focus();
+  });
+}
 
 questionForm.addEventListener("submit", async event => {
   event.preventDefault();
@@ -100,9 +103,9 @@ questionForm.addEventListener("submit", async event => {
   }
 
   askButton.disabled = true;
-  exampleButton.disabled = true;
+  for (const exampleButton of exampleButtons) exampleButton.disabled = true;
   questionInput.readOnly = true;
-  statusLine.textContent = "Checking the orientation guide…";
+  statusLine.textContent = "Checking the HR documents…";
   const controller = new AbortController();
   // Allow network travel around the server's shared 15-second deadline.
   const requestTimer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -126,11 +129,11 @@ questionForm.addEventListener("submit", async event => {
   } finally {
     clearTimeout(requestTimer);
     askButton.disabled = false;
-    exampleButton.disabled = false;
+    for (const exampleButton of exampleButtons) exampleButton.disabled = false;
     questionInput.readOnly = false;
     statusLine.textContent = "";
   }
 });
 
 askButton.disabled = false;
-exampleButton.hidden = false;
+examplesContainer.hidden = false;
