@@ -1,0 +1,22 @@
+[
+  {"id": "T01", "type": "direct", "question": "What time should I arrive on my first day?", "expected_passage": "HR-01-P2"},
+  {"id": "T02", "type": "direct", "question": "Which training modules do I have to complete in my first 14 days?", "expected_passage": "HR-01-P6"},
+  {"id": "T03", "type": "direct", "question": "Where can employees park?", "expected_passage": "HR-01-P9"},
+  {"id": "T04", "type": "direct", "question": "When does my health insurance coverage start?", "expected_passage": "HR-02-P2"},
+  {"id": "T05", "type": "direct", "question": "How much does the company match in the 401(k)-retirement plan?", "expected_passage": "HR-02-P5"},
+  {"id": "T06", "type": "direct", "question": "How many counseling sessions does the Employee Assistance Program provide?", "expected_passage": "HR-02-P7"},
+  {"id": "T07", "type": "direct", "question": "When will I get my first paycheck?", "expected_passage": "HR-03-P4"},
+  {"id": "T08", "type": "direct", "question": "When do I need to complete Form I-9?", "expected_passage": "HR-03-P2"},
+  {"id": "T09", "type": "direct", "question": "How many paid holidays does the company observe?", "expected_passage": "HR-04-P2"},
+  {"id": "T10", "type": "direct", "question": "How many paid sick days do I get?", "expected_passage": "HR-04-P5"},
+  {"id": "T11", "type": "direct", "question": "What is the dress code?", "expected_passage": "HR-05-P4"},
+  {"id": "T12", "type": "direct", "question": "Can I report a concern anonymously?", "expected_passage": "HR-05-P3"},
+  {"id": "T13", "type": "reworded", "question": "Can I take a vacation during my first month on the job?", "expected_passage": "HR-04-P9"},
+  {"id": "T14", "type": "reworded", "question": "Who will help me get used to my new team?", "expected_passage": "HR-01-P4"},
+  {"id": "T15", "type": "reworded", "question": "Is it OK to work from home?", "expected_passage": "HR-05-P5"},
+  {"id": "T16", "type": "reworded", "question": "What should I do if I misplace my work computer?", "expected_passage": "HR-05-P6"},
+  {"id": "T17", "type": "unsupported", "question": "What is the starting salary for my position?", "expected_passage": null},
+  {"id": "T18", "type": "unsupported", "question": "Does the company offer tuition reimbursement?", "expected_passage": null},
+  {"id": "T19", "type": "unsupported", "question": "Where in Building A is Room 204?", "expected_passage": null},
+  {"id": "T20", "type": "unsupported", "question": "How many days off do I get for a family member's wedding?", "expected_passage": null}
+]
