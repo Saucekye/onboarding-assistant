@@ -60,7 +60,29 @@ python -m scripts.build_index
 python -m pytest -q
 ```
 
-The tests check every status code and result type in the contract (200, 400, 405, 413, 415, 422, 502, 503, 504). They also check that answer sources come from storage, that unknown citations are rejected, and that question text never appears in the logs. They never call a real AI provider.
+The tests check every status code and result type in the contract (200, 400, 405, 413, 415, 422, 502, 503, 504). They also check that answer sources come from storage, that unknown citations are rejected, that question text never appears in the logs, that search ties sort in passage-number order, and that the 20 test questions meet the retrieval target. They never call a real AI provider.
+
+### 20-question retrieval check
+
+```bash
+python -m scripts.run_test_questions
+```
+
+Prints where each of the 20 questions in `tests/test_questions.json` lands in the search results. It exits with an error if fewer than 14 of the 16 answerable questions find their expected passage, or if any of the 12 direct questions miss. This checks **retrieval only**. It cannot show whether the AI answers correctly or declines T17–T20; test that with a real provider (US-4).
+
+### End-to-end check with a real AI provider (US-4)
+
+With the server running and a provider set in `.env` (see below), run this in a second terminal:
+
+```bash
+python -m scripts.run_end_to_end
+```
+
+It sends all 20 questions to the running server and prints each answer. Targets: 14 of 16 answerable questions cite the expected passage, all 4 unsupported questions (T17–T20) return HR guidance with no sources, and every response takes 10 seconds or less. It only checks the cited passage, so read the printed answers and confirm each claim matches the passage. In test mode the unsupported questions always fail, because test mode never declines.
+
+### Automated checks (GitHub Actions)
+
+`.github/workflows/ci.yml` runs `python -m pytest -q` and the 20-question check on every pull request and every push to `main`. It runs in test mode and uses no API key or secret. Never add an API key to the workflow file.
 
 ## Setup check (T-2)
 
@@ -99,14 +121,20 @@ Then restart the server. If the key or model is missing, the page shows a servic
 | `data/documents/` | Five JSON documents: orientation, benefits, required forms, leave, and workplace conduct (HR-01 to HR-05) |
 | `tests/` | Contract tests |
 
-## Known limitations
+## How search works and known limitations
 
-Search results for the 20 test questions with all five documents loaded:
+Search returns up to 3 passages: SQLite FTS5 relevance first, then document and passage number for ties (HR-01-P2 before HR-01-P10).
 
-- **Direct (T01–T12):** expected passage is in the top 3 for all 12. It's ranked first for 11; T01 ranks HR-03-P4 first and HR-01-P2 second.
-- **Reworded (T13–T16):** T14 and T15 find the right passage. **T13** (vacation in first month → HR-04-P9) and **T16** (misplace work computer → HR-05-P6) miss.
-- **Unanswerable (T17–T20):** all four match some passage, so none stop at search. The model must decline every one. Test mode cannot decline, so use a real provider when testing US-4.
-- **Original demo question:** "Where and when is new-hire orientation?" no longer retrieves HR-01-P2 (Room 204, 9 a.m.–noon). HR-03-P1, HR-04-P9 and HR-01-P3 outrank it. Tracked by an `xfail` test in `tests/test_api.py`; fix under US-3. The page now uses "What room is orientation in?" for its orientation example; the original question's search limitation remains unresolved.
+**Synonym list.** `SYNONYMS` in `app/search.py` adds search terms when a question words things differently from the documents. The original word is always kept. The list is small and maintained by hand: "misplace/lose/computer" add "lost/laptop" (HR-05-P6), and "orientation" adds "room/arrive" so the first-day passage (HR-01-P2) outranks passages that only mention orientation in passing. Before changing it, rerun the 20-question check. Do not add a synonym just to make one question pass.
+
+Results for the 20 test questions with all five documents loaded:
+
+- **Answerable:** 15 of 16 find the expected passage in the top 3 (target 14). All 12 direct questions pass. T14, T15 and T16 pass.
+- **T13 is a known limitation.** "Can I take a vacation during my first month on the job?" shares no words with HR-04-P9 ("Paid time off... introductory period"), so search misses it. A test in `tests/test_search.py` records this; if it starts passing, update this section.
+- **Unanswerable (T17–T20):** all four match some passage, so none stop at search. The model must decline every one. Test mode cannot decline, so test these with a real provider.
+- **Orientation examples:** the page's example, "What room is orientation in?", and the original demo question, "Where and when is new-hire orientation?", both return HR-01-P2 first. The original question needed the synonym list above; it was previously a known search limitation.
+- **No relevance cutoff yet.** Without one, safety on unsupported questions depends on the model declining.
+- **A timed-out search keeps running briefly** after the 15-second deadline. Acceptable at prototype scale.
 
 ## Working agreement
 

@@ -1,0 +1,30 @@
+name: CI
+
+# Quality gate: runs on every pull request and on pushes to main.
+# It never uses an AI provider or any secret. Tests run in test mode (AI_PROVIDER=fake).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      AI_PROVIDER: fake
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Contract and search tests
+        run: python -m pytest -q
+
+      - name: 20-question retrieval check (target 14 of 16)
+        run: python -m scripts.run_test_questions

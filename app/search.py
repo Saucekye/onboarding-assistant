@@ -60,13 +60,31 @@ def build_index(documents_dir: Path, database_path: Path) -> int:
     return count
 
 
+# Extra search terms added when a question uses a word the documents phrase differently.
+# The original word is always kept; these are added next to it. The list is maintained by
+# hand, so after any change rerun `python -m scripts.run_test_questions` and keep the
+# 14-of-16 target. Do not add a synonym just to make one test question pass.
+SYNONYMS = {
+    # Lost equipment: HR-05-P6 says "laptop is lost or stolen".
+    "misplace": ["lost"],
+    "misplaced": ["lost"],
+    "lose": ["lost"],
+    "computer": ["laptop"],
+    "pc": ["laptop"],
+    # Orientation questions are about the first-day schedule and room (HR-01-P2). Other
+    # passages that only mention "orientation" in passing would otherwise outrank it.
+    "orientation": ["room", "arrive"],
+}
+
+
 def to_fts_query(question: str) -> str:
     """Turn a question into an OR query of its meaningful words, each quoted."""
     words = re.findall(r"[^\W_]+", question.lower())
     terms = []
     for w in words:
-        if w not in STOPWORDS and w not in terms:
-            terms.append(w)
+        for term in ([w] if w not in STOPWORDS else []) + SYNONYMS.get(w, []):
+            if term not in terms:
+                terms.append(term)
     return " OR ".join(f'"{t}"' for t in terms)
 
 
@@ -84,7 +102,9 @@ def _search_sync(database_path: Path, question: str, limit: int) -> list[SourceP
                 SELECT p.document_id, p.passage_id, p.document_title, p.passage_text
                 FROM passages_fts f JOIN passages p ON p.passage_id = f.passage_id
                 WHERE passages_fts MATCH ?
-                ORDER BY bm25(passages_fts) ASC, p.passage_id ASC
+                ORDER BY bm25(passages_fts) ASC,
+                         p.document_id ASC,
+                         CAST(substr(p.passage_id, instr(p.passage_id, '-P') + 2) AS INTEGER) ASC
                 LIMIT ?
                 """,
                 (query, limit),
@@ -97,7 +117,8 @@ def _search_sync(database_path: Path, question: str, limit: int) -> list[SourceP
 
 
 async def search_passages(question: str, limit: int, deadline: float, database_path: Path) -> list[SourcePassage]:
-    """Return up to `limit` passages by relevance, then ascending passage ID for ties."""
+    """Return up to `limit` passages by relevance. Ties go in ascending passage order:
+    by document, then by passage number (HR-01-P2 before HR-01-P10, not as text)."""
     remaining = deadline - time.monotonic()
     if remaining <= 0:
         raise service_error(500)

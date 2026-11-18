@@ -49,9 +49,8 @@ def test_serves_page_and_script(client):
 
 # --- Supported answer path (fake provider) ---
 
-@pytest.mark.xfail(reason="Known gap (US-3): with all five documents, HR-01-P3, HR-03-P1 and HR-04-P9 outrank HR-01-P2", strict=True)
-def test_orientation_question_retrieves_hr01_p2():
-    """HR-01-P2 must be among the top 3 passages sent to the model."""
+def test_orientation_question_retrieves_hr01_p2_first():
+    """The demo question must put HR-01-P2 (Room 204, 8:30 a.m. arrival) first."""
     import tempfile
     from pathlib import Path
     from app.search import _search_sync, build_index
@@ -59,7 +58,7 @@ def test_orientation_question_retrieves_hr01_p2():
         db = Path(d) / "t.db"
         build_index(Path(__file__).parent.parent / "data" / "documents", db)
         ids = [p.passage_id for p in _search_sync(db, "Where and when is new-hire orientation?", 3)]
-    assert "HR-01-P2" in ids
+    assert ids[0] == "HR-01-P2"
 
 
 def test_fake_provider_cites_a_retrieved_passage(client):
