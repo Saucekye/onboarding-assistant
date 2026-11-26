@@ -136,6 +136,32 @@ Results for the 20 test questions with all five documents loaded:
 - **No relevance cutoff yet.** Without one, safety on unsupported questions depends on the model declining.
 - **A timed-out search keeps running briefly** after the 15-second deadline. Acceptable at prototype scale.
 
+## Documentation
+
+| Document | What it covers |
+| --- | --- |
+| `docs/API.md` | The `POST /api/questions` request, responses, status codes, and limits |
+| `docs/USER_MANUAL.md` | How new hires use the page, and how to run, configure, and update the assistant |
+| `docs/ci-cd-evidence.md` | What the GitHub Actions pipeline checks and how to see its runs |
+| `docs/code-quality.md` | Test count, coverage, performance numbers, review evidence, and technical debt |
+| `docs/alpha-results.md` | Real-provider results for the 20 test questions and the API feasibility notes |
+
+Performance benchmark (our own code, test mode):
+
+```bash
+python -m scripts.benchmark
+```
+
+## Team and contributions
+
+| Member | Contributions |
+| --- | --- |
+| Ceth Solwazi (Integration Lead) | Starter application and API server, search and synonym handling, AI provider integration and its feasibility check (SP-1), GitHub Actions pipeline, 20-question test and results documentation, written peer review of pull request #2 |
+| Alex Luna | Web interface (`static/index.html`, `static/app.js`), expanded to all five HR documents in pull request #2; reviewed pull request #3 |
+| Medlina Kanu | Testing and review of the search module, including finding the passage-ordering bug fixed in pull request #3; Unit 6 risk and impact statement |
+
+Commit history and pull request reviews on GitHub show each member's work in detail.
+
 ## Working agreement
 
 - Branch from `main` for each backlog item (e.g., `t2-starter`, `us1-answer-flow`) and open a pull request.
