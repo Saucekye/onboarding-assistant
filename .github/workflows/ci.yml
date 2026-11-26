@@ -23,8 +23,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Contract and search tests
-        run: python -m pytest -q
+      - name: Contract and search tests, with coverage (must stay at or above 80%)
+        run: python -m pytest -q --cov=app --cov-report=term-missing --cov-fail-under=80
 
       - name: 20-question retrieval check (target 14 of 16)
         run: python -m scripts.run_test_questions
